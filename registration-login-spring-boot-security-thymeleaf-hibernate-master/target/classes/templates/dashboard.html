@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4;}
+    h1 { text-align: center; color: #333;}
+    .container { max-width:800px;margin:auto;padding:20px;background:white;border-radius:8px;box-shadow:0 2px10px rgba(0,0,0,0.1);}
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Dashboard</h1>
+
+  <h2>Welcome to the Scheme Calculator Dashboard!</h2>
+  <p>This dashboard provides an overview of your scheme calculations.</p>
+
+  <h3>All Schemes</h3>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Entry Amount</th>
+      <th>Total Months</th>
+      <th>Tax Percentage</th>
+      <th>Total Amount</th>
+      <th>Tax Amount</th>
+      <th>Receive Amount</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Iterating over the schemes from the controller -->
+    <tr th:each="scheme : ${schemes}">
+      <td th:text="${scheme.id}"></td>
+      <td th:text="${scheme.name}"></td>
+      <td th:text="${scheme.entryAmount}"></td>
+      <td th:text="${scheme.totalMonths}"></td>
+      <td th:text="${scheme.taxPercentage}"></td>
+      <td th:text="${scheme.totalAmount}"></td>
+      <td th:text="${scheme.taxAmount}"></td>
+      <td th:text="${scheme.totalReceiveAmount}"></td>
+      <td>
+        <form th:action="@{/dashboard/delete/{id}(id=${scheme.id})}" method="post">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p><a href="/calculate">Go to Scheme Calculator</a></p>
+</div>
+
+</body>
+</html>

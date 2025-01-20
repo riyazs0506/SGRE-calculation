@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheme Calculator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+    h1 { text-align: center; color: #5e057e; }
+    .container { max-width: 800px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    form { display: flex; flex-direction: column; }
+    label { margin: 10px 0 5px; }
+    input { padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #ddd; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield; /* For Firefox */
+    }
+    button { padding: 10px; background-color: #7c3fa6; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #5e057e; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Scheme Calculator</h1>
+
+  <form id="schemeForm">
+    <label for="name">Scheme Name:</label>
+    <input type="text" id="name" required>
+
+    <label for="entryAmount">Entry Amount:</label>
+    <input type="number" id="entryAmount" required>
+
+    <label for="totalMonths">Total Months:</label>
+    <input type="number" id="totalMonths" required>
+
+    <label for="taxPercentage">Tax Percentage (%):</label>
+    <input type="number" id="taxPercentage" required>
+
+    <button type="submit">Calculate</button>
+  </form>
+
+  <h2>Calculation Results</h2>
+  <table id="resultsTable">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Total Amount</th>
+      <th>Tax Amount</th>
+      <th>Total Receive Amount</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+  document.getElementById('schemeForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Get form inputs
+    const schemeName = document.getElementById('name').value;
+    const entryAmount = parseFloat(document.getElementById('entryAmount').value);
+    const totalMonths = parseInt(document.getElementById('totalMonths').value);
+    const taxPercentage = parseFloat(document.getElementById('taxPercentage').value);
+
+    // Perform calculations
+    const totalAmount = entryAmount * totalMonths * 30; // Total amount for all months
+    const taxAmount = (totalAmount * taxPercentage) / 100; // Tax amount
+    const totalReceiveAmount = totalAmount - taxAmount; // Amount after tax deduction
+
+    // Prepare data for the backend
+    const scheme = {
+      name: schemeName,
+      entryAmount: entryAmount,
+      totalMonths: totalMonths,
+      taxPercentage: taxPercentage,
+      totalAmount: totalAmount,
+      taxAmount: taxAmount,
+      totalReceiveAmount: totalReceiveAmount
+    };
+
+    // Send the data to the backend
+    const response = await fetch('/api/schemes/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scheme)
+    });
+
+    if (response.ok) {
+      const savedScheme = await response.json();
+      alert('Scheme saved successfully with ID: ' + savedScheme.id);
+    } else {
+      alert('Failed to save scheme.');
+    }
+
+    // Add results to the table
+    const resultsTableBody = document.querySelector('#resultsTable tbody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${schemeName}</td>
+      <td>${totalAmount.toFixed(2)}</td>
+      <td>${taxAmount.toFixed(2)}</td>
+      <td>${totalReceiveAmount.toFixed(2)}</td>
+    `;
+    resultsTableBody.appendChild(row);
+
+    // Clear the form
+    document.getElementById('schemeForm').reset();
+  });
+</script>
+
+</body>
+</html>
